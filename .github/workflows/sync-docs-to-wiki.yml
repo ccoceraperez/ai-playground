@@ -34,7 +34,6 @@ jobs:
       - name: Generate Wiki Pages
         run: |
           # Create Home.md
-          echo "# Project Wiki" > wiki/Home.md
           echo "" >> wiki/Home.md
           echo "## 📚 Repository Documentation" >> wiki/Home.md
           echo "[Repository Documentation](Repository-Documentation)" >> wiki/Home.md
