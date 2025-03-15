@@ -1,0 +1,64 @@
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "_docs/**"
+      - "README.md"
+jobs:
+  update-wiki:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Checkout Wiki Repository
+        run: |
+          git clone https://github.com/${{ github.repository }}.wiki.git wiki
+      - name: Generate Wiki Pages
+        run: |
+          # Create Home.md
+          echo "# Project Wiki" > wiki/Home.md
+          echo "" >> wiki/Home.md
+          echo "## :book: Repository Documentation" >> wiki/Home.md
+          echo "[Repository Documentation](Repository-Documentation)" >> wiki/Home.md
+          echo "" >> wiki/Home.md
+          echo "## :hammer_and_wrench: Technical Content" >> wiki/Home.md
+          echo "[Technical Content](Technical-Content)" >> wiki/Home.md
+          # Create Repository-Documentation.md with README sections
+          echo "# Repository Documentation" > wiki/Repository-Documentation.md
+          echo "" >> wiki/Repository-Documentation.md
+          cat README.md >> wiki/Repository-Documentation.md
+          echo "" >> wiki/Repository-Documentation.md
+          echo "## Sections" >> wiki/Repository-Documentation.md
+          grep -E '^## ' README.md | sed 's/^## //g' | while read -r section; do
+            link=$(echo "$section" | tr ' ' '-' | tr '[:upper:]' '[:lower:]')
+            echo "- [$section](#${link})" >> wiki/Repository-Documentation.md
+          done
+          # Create Technical-Content.md with links to all _docs files
+          echo "# Technical Content" > wiki/Technical-Content.md
+          echo "" >> wiki/Technical-Content.md
+          for file in _docs/*.md; do
+            filename=$(basename "$file" .md)
+            echo "## [$filename]($filename)" >> wiki/Technical-Content.md
+          done
+          # Create individual _docs wiki pages
+          for file in _docs/*.md; do
+            filename=$(basename "$file" .md)
+            echo "# ${filename^}" > wiki/"${filename}.md"
+            cat "$file" >> wiki/"${filename}.md"
+            echo "" >> wiki/"${filename}.md"
+            echo "## Sections" >> wiki/"${filename}.md"
+            grep -E '^## ' "$file" | sed 's/^## //g' | while read -r section; do
+              link=$(echo "$section" | tr ' ' '-' | tr '[:upper:]' '[:lower:]')
+              echo "- [$section](#${link})" >> wiki/"${filename}.md"
+            done
+          done
+      - name: Commit and Push Changes
+        run: |
+          cd wiki
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Auto-update Wiki from _docs and README" || echo "No changes to commit"
+          git push
