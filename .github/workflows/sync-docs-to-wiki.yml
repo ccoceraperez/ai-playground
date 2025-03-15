@@ -27,6 +27,11 @@ jobs:
         run: |
           git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/ccoceraperez/ai-playground.wiki.git wiki
 
+      - name: Clear Wiki Repository
+        run: |
+          cd wiki
+          rm -rf *
+
       - name: Generate Wiki Pages
         run: |
           # Create Home.md
@@ -34,22 +39,48 @@ jobs:
           echo "## 🛠️ [Technical Content](https://github.com/ccoceraperez/ai-playground/wiki/Technical-Content)" >> wiki/Home.md
 
           # Create Repository-Documentation.md with README sections
-          echo "" > wiki/Repository-Documentation.md
-          grep -E '^##? ' README.md | sed 's/^##* //g' | while read -r section; do
-            link=$(echo "$section" | tr ' ' '-' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-zA-Z0-9-]//g')
-            echo "## [${section^}](https://github.com/ccoceraperez/ai-playground#${link})" >> wiki/Repository-Documentation.md
-          done
+          echo "# Repository Documentation" > wiki/Repository-Documentation.md
+          echo "" >> wiki/Repository-Documentation.md
+          while read -r line; do
+            if [[ $line =~ ^##\ (.*) ]]; then
+              section="${BASH_REMATCH[1]}"
+              link=$(echo "$section" | tr ' ' '-' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-zA-Z0-9-]//g')
+              echo "## [$section](https://github.com/ccoceraperez/ai-playground/edit/main/README.md#${link})" >> wiki/Repository-Documentation.md
+            elif [[ $line =~ ^###\ (.*) ]]; then
+              subsection="${BASH_REMATCH[1]}"
+              sublink=$(echo "$subsection" | tr ' ' '-' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-zA-Z0-9-]//g')
+              echo "### [$subsection](https://github.com/ccoceraperez/ai-playground/edit/main/README.md#${sublink})" >> wiki/Repository-Documentation.md
+            fi
+          done < README.md
           echo "" >> wiki/Repository-Documentation.md
 
           # Create Technical-Content.md with links to all _docs files
-          echo "" > wiki/Technical-Content.md
+          echo "# Technical Content" > wiki/Technical-Content.md
+          echo "" >> wiki/Technical-Content.md
           for file in _docs/*.md; do
             filename=$(basename "$file" .md)
-            echo "## [${filename^}](https://github.com/ccoceraperez/ai-playground/blob/main/_docs/${filename}.md)" >> wiki/Technical-Content.md
-            grep -E '^##? ' "$file" | sed 's/^##* //g' | while read -r section; do
-              link=$(echo "$section" | tr ' ' '-' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-zA-Z0-9-]//g')
-              echo "- [${section^}](https://github.com/ccoceraperez/ai-playground/blob/main/_docs/${filename}.md#${link})" >> wiki/Technical-Content.md
-            done
+            echo "## [$filename](https://github.com/ccoceraperez/ai-playground/blob/main/_docs/${filename}.md)" >> wiki/Technical-Content.md
+            while read -r line; do
+              if [[ $line =~ ^##\ (.*) ]]; then
+                section="${BASH_REMATCH[1]}"
+                link=$(echo "$section" | tr ' ' '-' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-zA-Z0-9-]//g')
+                echo "### [$section](https://github.com/ccoceraperez/ai-playground/blob/main/_docs/${filename}.md#${link})" >> wiki/Technical-Content.md
+              elif [[ $line =~ ^###\ (.*) ]]; then
+                subsection="${BASH_REMATCH[1]}"
+                sublink=$(echo "$subsection" | tr ' ' '-' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-zA-Z0-9-]//g')
+                echo "#### [$subsection](https://github.com/ccoceraperez/ai-playground/blob/main/_docs/${filename}.md#${sublink})" >> wiki/Technical-Content.md
+              fi
+            done < "$file"
+          done
+
+          # Ensure V3 is included correctly
+          for file in _docs/*.md; do
+            filename=$(basename "$file" .md)
+            while read -r line; do
+              if [[ $line =~ ^##\ V3 ]]; then
+                echo "## [V3](https://github.com/ccoceraperez/ai-playground/blob/main/_docs/${filename}.md#v3)" >> wiki/Technical-Content.md
+              fi
+            done < "$file"
           done
 
       - name: Commit and Push Changes
