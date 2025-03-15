@@ -1,2 +1,2 @@
-# 🏛️Architecture
-## Diagrams
+## 🏛️Architecture Overview
+## 🐕Diagrams
