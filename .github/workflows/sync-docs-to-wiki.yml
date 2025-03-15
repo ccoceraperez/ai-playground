@@ -37,12 +37,8 @@ jobs:
       - name: Generate Wiki Pages
         run: |
           # Create Home.md
-          echo "" >> wiki/Home.md
-          echo "## 📚 Repository Documentation" >> wiki/Home.md
-          echo "[Repository Documentation](Repository-Documentation)" >> wiki/Home.md
-          echo "" >> wiki/Home.md
-          echo "## 🛠️ Technical Content" >> wiki/Home.md
-          echo "[Technical Content](Technical-Content)" >> wiki/Home.md
+          echo "## 📚 [Repository Documentation](https://github.com/ccoceraperez/ai-playground/wiki/Repository-Documentation)" > wiki/Home.md
+          echo "## 🛠️ [Technical Content](https://github.com/ccoceraperez/ai-playground/wiki/Technical-Content)" >> wiki/Home.md
 
           # Create Repository-Documentation.md with README sections
           echo "" >> wiki/Repository-Documentation.md
