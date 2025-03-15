@@ -5,6 +5,9 @@ on:
   pull_request:
     branches:
       - "main"
+    # Remove the paths filter to match any branch name containing */ci-*
+    # paths:
+    #   - "*/ci-*"
 # https://github.com/ccoceraperez/ai-playground/wiki
 permissions:
   contents: write
