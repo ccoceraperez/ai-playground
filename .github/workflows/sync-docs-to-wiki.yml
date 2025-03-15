@@ -1,15 +1,10 @@
 on:
   push:
     branches:
-      - "*/*"
-    # paths:
-    #   - "**/**"
-    #   - "README.md"
-    # branches:
-    #   - "main"
-    # paths:
-    #   - "_docs/**"
-    #   - "README.md"
+      - "main"
+  pull_request:
+    branches:
+      - "main"
 # https://github.com/ccoceraperez/ai-playground/wiki
 permissions:
   contents: write
