@@ -1,11 +1,24 @@
 on:
   push:
     branches:
-      - main
-    paths:
-      - "_docs/**"
-      - "README.md"
-
+      - "carlos/ci-sync-docs-with-wiki"
+    # paths:
+    #   - "**/**"
+    #   - "README.md"
+    # branches:
+    #   - "main"
+    # paths:
+    #   - "_docs/**"
+    #   - "README.md"
+# https://github.com/ccoceraperez/ai-playground/wiki
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  actions: write
+  checks: write
+  deployments: write
+  statuses: write
 jobs:
   update-wiki:
     runs-on: ubuntu-latest
@@ -13,7 +26,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Debug Info
+        run: |
+          echo "Repository: ${{ github.repository }}"
+          echo "Token: ${{ secrets.GITHUB_TOKEN }}"
+
       - name: Checkout Wiki Repository
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/ccoceraperez/ai-playground.wiki.git wiki
 
