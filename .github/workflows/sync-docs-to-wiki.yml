@@ -37,7 +37,7 @@ jobs:
           # Create Home.md
           echo "# Project Wiki" > wiki/Home.md
           echo "" >> wiki/Home.md
-          echo "## 📄 Repository Documentation" >> wiki/Home.md
+          echo "## 📚 Repository Documentation" >> wiki/Home.md
           echo "[Repository Documentation](Repository-Documentation)" >> wiki/Home.md
           echo "" >> wiki/Home.md
           echo "## 🛠️ Technical Content" >> wiki/Home.md
@@ -47,10 +47,9 @@ jobs:
           echo "" >> wiki/Repository-Documentation.md
           cat README.md >> wiki/Repository-Documentation.md
           echo "" >> wiki/Repository-Documentation.md
-          echo "## Sections" >> wiki/Repository-Documentation.md
           grep -E '^## ' README.md | sed 's/^## //g' | while read -r section; do
             link=$(echo "$section" | tr ' ' '-' | tr '[:upper:]' '[:lower:]')
-            echo "- [$section](#${link})" >> wiki/Repository-Documentation.md
+            echo "## [$section](#${link})" >> wiki/Repository-Documentation.md
           done
           # Create Technical-Content.md with links to all _docs files
           echo "# Technical Content" > wiki/Technical-Content.md
