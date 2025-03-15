@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - "*/*"
+      - "carlos/ci-sync-docs-with-wiki"
     # paths:
     #   - "**/**"
     #   - "README.md"
@@ -50,9 +50,8 @@ jobs:
           echo "" >> wiki/Repository-Documentation.md
           grep -E '^##? ' README.md | sed 's/^##* //g' | while read -r section; do
             link=$(echo "$section" | tr ' ' '-' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-zA-Z0-9-]//g')
-            echo "- [$section](https://github.com/ccoceraperez/ai-playground#${link})" >> wiki/Repository-Documentation.md
+            echo "## [$section](https://github.com/ccoceraperez/ai-playground/edit/main/README.md#${link})" >> wiki/Repository-Documentation.md
           done
-          cat README.md >> wiki/Repository-Documentation.md
           echo "" >> wiki/Repository-Documentation.md
           # Create Technical-Content.md with links to all _docs files
           echo "" >> wiki/Technical-Content.md
