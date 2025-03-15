@@ -26,11 +26,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Debug Info
-        run: |
-          echo "Repository: ${{ github.repository }}"
-          echo "Token: ${{ secrets.GITHUB_TOKEN }}"
-
       - name: Checkout Wiki Repository
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -63,18 +58,6 @@ jobs:
           for file in _docs/*.md; do
             filename=$(basename "$file" .md)
             echo "## [$filename]($filename)" >> wiki/Technical-Content.md
-          done
-          # Create individual _docs wiki pages
-          for file in _docs/*.md; do
-            filename=$(basename "$file" .md)
-            echo "# ${filename^}" > wiki/"${filename}.md"
-            cat "$file" >> wiki/"${filename}.md"
-            echo "" >> wiki/"${filename}.md"
-            echo "## Sections" >> wiki/"${filename}.md"
-            grep -E '^## ' "$file" | sed 's/^## //g' | while read -r section; do
-              link=$(echo "$section" | tr ' ' '-' | tr '[:upper:]' '[:lower:]')
-              echo "- [$section](#${link})" >> wiki/"${filename}.md"
-            done
           done
 
       - name: Commit and Push Changes
