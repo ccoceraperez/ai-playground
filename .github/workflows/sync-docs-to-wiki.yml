@@ -37,10 +37,10 @@ jobs:
           # Create Home.md
           echo "# Project Wiki" > wiki/Home.md
           echo "" >> wiki/Home.md
-          echo "## :book: Repository Documentation" >> wiki/Home.md
+          echo "## 📄 Repository Documentation" >> wiki/Home.md
           echo "[Repository Documentation](Repository-Documentation)" >> wiki/Home.md
           echo "" >> wiki/Home.md
-          echo "## :hammer_and_wrench: Technical Content" >> wiki/Home.md
+          echo "## 🛠️ Technical Content" >> wiki/Home.md
           echo "[Technical Content](Technical-Content)" >> wiki/Home.md
           # Create Repository-Documentation.md with README sections
           echo "# Repository Documentation" > wiki/Repository-Documentation.md
