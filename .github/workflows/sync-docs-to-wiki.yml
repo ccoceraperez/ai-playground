@@ -1,0 +1,77 @@
+on:
+  push:
+    branches:
+      - "carlos/ci-sync-docs-with-wiki"
+    # paths:
+    #   - "**/**"
+    #   - "README.md"
+    # branches:
+    #   - "main"
+    # paths:
+    #   - "_docs/**"
+    #   - "README.md"
+# https://github.com/ccoceraperez/ai-playground/wiki
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  actions: write
+  checks: write
+  deployments: write
+  statuses: write
+jobs:
+  update-wiki:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Checkout Wiki Repository
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/ccoceraperez/ai-playground.wiki.git wiki
+
+      - name: Clear Wiki Repository
+        run: |
+          rm -rf wiki/*
+
+      - name: Generate Wiki Pages
+        run: |
+          # Create Home.md
+          echo "# Project Wiki" > wiki/Home.md
+          echo "" >> wiki/Home.md
+          echo "## 📚 Repository Documentation" >> wiki/Home.md
+          echo "[Repository Documentation](Repository-Documentation)" >> wiki/Home.md
+          echo "" >> wiki/Home.md
+          echo "## 🛠️ Technical Content" >> wiki/Home.md
+          echo "[Technical Content](Technical-Content)" >> wiki/Home.md
+          # Create Repository-Documentation.md with README sections
+          echo "# Repository Documentation" > wiki/Repository-Documentation.md
+          echo "" >> wiki/Repository-Documentation.md
+          grep -E '^##? ' README.md | sed 's/^##* //g' | while read -r section; do
+            link=$(echo "$section" | tr ' ' '-' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-zA-Z0-9-]//g')
+            echo "- [$section](https://github.com/ccoceraperez/ai-playground#${link})" >> wiki/Repository-Documentation.md
+          done
+          cat README.md >> wiki/Repository-Documentation.md
+          echo "" >> wiki/Repository-Documentation.md
+          # Create Technical-Content.md with links to all _docs files
+          echo "# Technical Content" > wiki/Technical-Content.md
+          echo "" >> wiki/Technical-Content.md
+          for file in _docs/*.md; do
+            filename=$(basename "$file" .md)
+            echo "## [$filename](https://github.com/ccoceraperez/ai-playground/blob/main/_docs/${filename}.md)" >> wiki/Technical-Content.md
+            grep -E '^##? ' "$file" | sed 's/^##* //g' | while read -r section; do
+              link=$(echo "$section" | tr ' ' '-' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-zA-Z0-9-]//g')
+              echo "- [$section](https://github.com/ccoceraperez/ai-playground/blob/main/_docs/${filename}.md#${link})" >> wiki/Technical-Content.md
+            done
+          done
+
+      - name: Commit and Push Changes
+        run: |
+          cd wiki
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Auto-update Wiki from _docs and README" || echo "No changes to commit"
+          git push
