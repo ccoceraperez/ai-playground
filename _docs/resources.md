@@ -1,4 +1,0 @@
-# 🧑‍💻Resources
-## WHatever
-- A
-- B
